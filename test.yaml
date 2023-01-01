@@ -10,3 +10,8 @@
     accepted_values:
       - "8589934592"
     acquire: "lshw -C memory -json | jq '.[] | select(.description == \"System memory\") | .size'"
+  BOM_NETWORK:
+    category: "net"
+    accepted_values:
+      - "82540EM Gigabit Ethernet Controller"
+    acquire: "lshw -C network -json | jq '.[] | select(.product == \"82540EM Gigabit Ethernet Controller\") | .product' | sed 's/\"//g'"
