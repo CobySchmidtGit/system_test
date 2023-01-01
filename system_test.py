@@ -1,4 +1,6 @@
 import errno
+import os
+
 import yaml
 import sys
 import subprocess
@@ -26,9 +28,22 @@ print(yaml_data['BOM']['category'])
 args = shlex.split(yaml_data['BOM']['acquire'])
 print(args)
 try:
-    p = subprocess.Popen(args)
+    p = subprocess.Popen(yaml_data['BOM']['acquire'], shell=True, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #string_out = os.system(yaml_data['BOM']['acquire'])
 except OSError as err:
     print("could not run command: ",yaml_data['BOM']['acquire'], file=sys.stderr)
     sys.exit(1)
 
-print (p)
+out, err = p.communicate()
+print (out.decode('ascii'))
+
+accepted_value = yaml_data['BOM']['accepted_values']
+string_to_compare=out.decode('ascii')
+print (string_to_compare)
+print (accepted_value)
+if string_to_compare == accepted_value:
+    print ("same")
+else:
+    print ("not same")
+
+
