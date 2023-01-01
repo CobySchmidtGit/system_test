@@ -1,7 +1,12 @@
 ---
-  BOM:
+  BOM_CPU:
     category: "cpu"
     accepted_values:
       - "Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz"
       - "11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz"
     acquire: "gawk -F':' -e '/model[[:space:]]name/ {print $2;exit;}' /proc/cpuinfo"
+  BOM_Memory:
+    category: "mem"
+    accepted_values:
+      - "8589934592"
+    acquire: "lshw -C memory -json | jq '.[] | select(.description == \"System memory\") | .size'"
