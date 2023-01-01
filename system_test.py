@@ -1,6 +1,8 @@
 import errno
 import yaml
 import sys
+import subprocess
+import shlex
 
 print("hello_world")
 n_args = len(sys.argv)
@@ -19,7 +21,14 @@ except IOError as e:
     sys.exit(1)
 
 
-yaml_data=yaml.load(fileb)
-for BOM in yaml_data:
-        for dir in BOM:
-                print (dir)
+yaml_data=yaml.safe_load(fileb)
+print(yaml_data['BOM']['category'])
+args = shlex.split(yaml_data['BOM']['acquire'])
+print(args)
+try:
+    p = subprocess.Popen(args)
+except OSError as err:
+    print("could not run command: ",yaml_data['BOM']['acquire'], file=sys.stderr)
+    sys.exit(1)
+
+print (p)
