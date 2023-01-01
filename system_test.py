@@ -6,7 +6,6 @@ import sys
 import subprocess
 import shlex
 
-print("hello_world")
 n_args = len(sys.argv)
 
 if (n_args==1):
@@ -16,34 +15,37 @@ if (n_args==1):
 
 file_name = sys.argv[1]
 
-try:
-    fileb = open(file_name, 'r')
-except IOError as e:
-    print("could not open file", file_name,  ":", e.strerror, file=sys.stderr)
-    sys.exit(1)
+class YamlLoader:
+    def __init__(self, yaml_file_name):
+        self.file_name = yaml_file_name
+        self.fileb = open(file_name, 'r')
+        self.data = yaml.safe_load(self.fileb)
 
 
-yaml_data=yaml.safe_load(fileb)
-print(yaml_data['BOM']['category'])
-args = shlex.split(yaml_data['BOM']['acquire'])
-print(args)
-try:
-    p = subprocess.Popen(yaml_data['BOM']['acquire'], shell=True, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #string_out = os.system(yaml_data['BOM']['acquire'])
-except OSError as err:
-    print("could not run command: ",yaml_data['BOM']['acquire'], file=sys.stderr)
-    sys.exit(1)
+class Verifier(YamlLoader):
+    def verify(self):
+        all_pass = True
+        for verifier in self.data:
+            print(verifier)
+            print("verifying ",self.data[verifier]['category'])
+            this_pipe = subprocess.Popen(self.data[verifier]['acquire'], shell=True, bufsize=-1, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            out, err = this_pipe.communicate()
+            string_to_compare = out.decode('ascii').strip()
+            print("\t got:", string_to_compare)
+            matched = False
+            for possible_match in self.data[verifier]['accepted_values']:
+                if string_to_compare == possible_match:
+                    matched = True
+            if matched is False:
+                print ("could not verify")
+                all_pass = False
+        return all_pass
 
-out, err = p.communicate()
-print (out.decode('ascii'))
 
-accepted_value = yaml_data['BOM']['accepted_values']
-string_to_compare=out.decode('ascii')
-print (string_to_compare)
-print (accepted_value)
-if string_to_compare == accepted_value:
-    print ("same")
-else:
-    print ("not same")
+system_ok = Verifier(file_name).verify()
+print("system is ok? ",system_ok)
+
+
 
 

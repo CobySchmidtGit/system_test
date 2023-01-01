@@ -1,5 +1,7 @@
 ---
   BOM:
     category: "cpu"
-    accepted_values: " 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz\n"
+    accepted_values:
+      - "Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz"
+      - "11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz"
     acquire: "gawk -F':' -e '/model[[:space:]]name/ {print $2;exit;}' /proc/cpuinfo"
